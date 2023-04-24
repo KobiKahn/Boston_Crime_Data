@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import folium
 from collections import OrderedDict
 # plt.style.use('seaborn')
 # plt.style.use('fivethirtyeight')
@@ -64,11 +65,44 @@ def graph_bar(x_list, y_list, name):
     plt.show()
 
 
+def plot_map(district, crime, all=False):
+    boston_districts = {'Downtown': 'A1', 'Charleston': 'A15',
+                        'East Boston': 'A7', 'Roxbury': 'B2',
+                        'Mattapan': 'B3', 'South Boston': 'C6',
+                        'Dorchester': 'C11', 'South End': 'D4',
+                        'Brighton': 'D14', 'West Roxbury': 'E5',
+                        'Jamaica Plain': 'E13', 'Hyde Park': 'E18'}
+    offense_df = crime_df[crime_df['OFFENSE_CODE_GROUP'] == crime]
+    if all:
+        lat_list = list(offense_df['Lat'].dropna())
+        long_list = list(offense_df['Long'].dropna())
+        type_list = list(offense_df['OFFENSE_DESCRIPTION'])
+    else:
+        spec_df = offense_df
+        key_district = boston_districts[district]
+        i_list = offense_df.index[offense_df['DISTRICT'] != key_district].tolist()
+        spec_df = spec_df.drop(i_list)
+        spec_df = spec_df.reset_index()
+        lat_list = list(spec_df['Lat'].dropna())
+        long_list = list(spec_df['Long'].dropna())
+        type_list = list(spec_df['OFFENSE_DESCRIPTION'])
+
+    m = folium.Map([42.32, -71.0589], zoom_start=12)
+    for val in range(len(lat_list)):
+        folium.Marker(location=(lat_list[val], long_list[val]), popup=type_list[val]).add_to(m)
+    m.save('index.html')
+
 # VARIABLES AND STARTING STUFF
 crime_df = pd.read_csv('Jacob Kahn - crime.csv', delim_whitespace=False, encoding="latin1")
 code_group = list(crime_df['OFFENSE_CODE_GROUP'])
+# month_crimes(2017)
 
-month_crimes(2017)
+#########################
+# PROJECT TWO OF PLOTTING##
+##########################
+plot_map('Jamaica Plain', 'Auto Theft')
+
+
 
 ###################################
 # OTHER PROJECT THAT WE DID FIRST#
