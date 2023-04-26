@@ -65,6 +65,35 @@ def graph_bar(x_list, y_list, name):
     plt.show()
 
 
+def top_5(key_district):
+    boston_districts = {'Downtown': 'A1', 'Charleston': 'A15',
+                        'East Boston': 'A7', 'Roxbury': 'B2',
+                        'Mattapan': 'B3', 'South Boston': 'C6',
+                        'Dorchester': 'C11', 'South End': 'D4',
+                        'Brighton': 'D14', 'West Roxbury': 'E5',
+                        'Jamaica Plain': 'E13', 'Hyde Park': 'E18'}
+    district = boston_districts[key_district]
+    offense_df = crime_df
+    i_list = offense_df.index[offense_df['DISTRICT'] != district].tolist()
+    spec_df = offense_df
+    spec_df = spec_df.drop(i_list)
+    spec_df = spec_df.reset_index()
+    crime_list = spec_df['OFFENSE_CODE_GROUP']
+    crime_dict = {}
+    for crime in crime_list:
+        if crime in crime_dict.keys():
+            crime_dict[crime] += 1
+        else:
+            crime_dict[crime] = 0
+    # {k: v for k, v in sorted(crime_dict.items(), key=lambda item: item[1])}
+    crime_dict = dict(sorted(crime_dict.items(), key=lambda item: item[1]))
+    top_5_crimes = list(crime_dict)[-5:]
+    top_5_crimes = ', '.join(top_5_crimes)
+    print(f'THE TOP 5 CRIMES IN {key_district} ARE: {top_5_crimes}')
+    # print(crime_dict)
+
+
+
 def plot_map(district, crime, all=False):
     boston_districts = {'Downtown': 'A1', 'Charleston': 'A15',
                         'East Boston': 'A7', 'Roxbury': 'B2',
@@ -100,8 +129,11 @@ code_group = list(crime_df['OFFENSE_CODE_GROUP'])
 #########################
 # PROJECT TWO OF PLOTTING##
 ##########################
-plot_map('Jamaica Plain', 'Auto Theft')
+# plot_map('Jamaica Plain', 'Other')
 
+
+# FIND TOP 5 CRIMES IN EACH DISTRICT
+top_5('Jamaica Plain')
 
 
 ###################################
